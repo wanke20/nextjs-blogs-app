@@ -1,21 +1,31 @@
-import Comments from "@/components/Comments";
-import FormComment from "@/components/FormComment";
+import Comments from "@/components/comments";
+import FormComments from "@/components/form-comments";
+import prisma from "@/lib/db";
+import { FC } from "react";
 
+interface BlogDetailPageProps {
+  params: {
+    id: string
+  }
+}
+const BlogDetailPage: FC<BlogDetailPageProps> = async ({ params }) => {
+  const post = await prisma.post.findFirst({
+    where: {
+      id: params.id
+    },
+    include: {
+      author: true,
+    }
+  });
 
-const BlogDetailPage = () => {
   return (
     <div className="max-w-4xl mx-auto py-8">
-      <h1 className="text-3xl font-bold">Post one</h1>
-      <p>Written by: john doe</p>
-      <div className="mt-4">
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Nihil eos
-        blanditiis atque tempore, unde aperiam nemo. Dignissimos fuga, odit ipsa
-        sed cum tempora laborum, inventore voluptates, quis amet consectetur
-        maiores!
-      </div>
+      <h1 className="text-3xl font-bold mb-4">{post?.title}</h1>
+      <p>Written by: {post?.author?.name}</p>
+      <div className="mt-4">{post?.content}</div>
 
-      <Comments />
-      <FormComment />
+      <Comments postId={params.id} />
+      <FormComments postId={params.id} />
     </div>
   );
 };
